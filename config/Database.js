@@ -8,8 +8,6 @@ const mongoDB_URL = `mongodb+srv://${encodeURIComponent(username)}:${encodeURICo
 const connectDb = async () => {
     await mongoose.connect(mongoDB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log(`connected to the database`)
-  
-
 };
 
 module.exports = connectDb;

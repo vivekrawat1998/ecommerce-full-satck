@@ -19,6 +19,10 @@ const Productschema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  category: {
+    type:String,
+    required:[true, "please enter the product category"]
+  },
   Images: [
     {
       public_id: {
@@ -32,10 +36,7 @@ const Productschema = mongoose.Schema({
     },
   ],
 
-  Category: {
-    type:String,
-    required:[true, "please enter the product category"]
-  },
+
   stocks:{
     type:String,
     required:[true, "please enter the stocks"],
