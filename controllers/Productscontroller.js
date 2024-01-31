@@ -5,8 +5,13 @@ const catcheasync = require("../middleware/catcheasync");
 
 //create Products
 
+
+//catch async is the a custom function to make it async so that it can reuse to the all controls///
+
 exports.createProduct = catcheasync(async (req, res, next) => {
   try {
+
+    //product.create is used for creating a product //
     const product = await Product.create(req.body);
     res.status(200).json({
       success: true,

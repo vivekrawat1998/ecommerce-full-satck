@@ -45,5 +45,4 @@ class Apifetures {
     return this;
   }
 }
-
 module.exports = Apifetures;
