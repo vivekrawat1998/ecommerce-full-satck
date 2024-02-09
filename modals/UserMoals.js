@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
-const JWTToken = require('jsonwebtoken');
-
+const JWTToken = require("jsonwebtoken");
+const crypto = require("crypto")
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -25,49 +25,72 @@ const userSchema = new mongoose.Schema({
     //select false is used because of i can't remember right now//
     select: false,
   },
-  avtar: {
-    public_id: {
-      type: String,
-      required: true,
-    },
-    url: {
-      type: String,
-      required: true,
-    },
+  // avtar: {
+  //   public_id: {
+  //     type: String,
+  //     required: true,
+  //   },
+  //   url: {
+  //     type: String,
+  //     required: true,
+  //   },
+  // },
+  role: {
+    type: String,
+    default: "user",
   },
-  role:{
-    type:String,
-    default:"user"
-  },
-  resetPasswordToken:String,
-  resetPasswordExpire:Date,
-
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
 });
 
+//bcrypt is use for making our password in hash value so that anybody not can see the password including admin also .....
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
 
-//bcrypt is use for making our password in hash value so that anybody not can see the password including admin also ..... 
-userSchema.pre("save", async function (next){
-//we give this condition beacuse if  the password is not chaanged so it will not rehash the value so that we use next() and if the password is changed the password will be decrypt//
-    if(!this.isModified("password")){
-        next();
-    }
-//.hash is used for dcrypt the paswword 
-    this.password = await bcrypt.hash(this.password, 10)
-})
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 //jwt tokens it is used for confirm to the server that he is the corrrect user it generate the token which we will save in the cookieparsor//
 
-
-userSchema.methods.getJWTToken = function(){
-    return JWTToken.sign({id: this._id},process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES
-    })
-}
+userSchema.methods.getJWTToken = function () {
+  // jwt token basically taking a payload and secret key the secret key is taken from dotenv file //
+  return JWTToken.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES,
+  });
+};
 
 //compare method for password //
 
-userSchema.methods.comparePassword = async function(password){
+userSchema.methods.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
 
-    return bcrypt.compare(password, this.password)
-}
-module.exports = mongoose.model("user", userSchema)
+//generte password
+
+//in this method we are using crypto for generating random password //
+userSchema.methods.getResetPasswordToken = function () {
+  // Generate a reset token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  //in this method we are using randomBytes for genertaing random password of 20digit and using hex to coonvert the buffer value to the hex digit//
+  
+  // Hash the token and set it to resetPasswordToken field
+  this.resetPasswordToken = crypto
+  //sha256 is the algorithm for security purppose // update for reset the tooken and digeest the hex value//
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+    //here we do for the reset password that how long it wil supported so it will support for only 15 minutes///
+
+  // Set token expiration
+  this.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 30 minutes
+
+  return resetToken;
+};
+module.exports = mongoose.model("user", userSchema);

@@ -3,22 +3,20 @@ const Errorhandler = require("../utils/errorhandler");
 const Apifetures = require("../utils/apifeatures");
 const catcheasync = require("../middleware/catcheasync");
 
-//create Products
-
-
-//catch async is the a custom function to make it async so that it can reuse to the all controls///
+// create Products
 
 exports.createProduct = catcheasync(async (req, res, next) => {
-  try {
+  req.body.user = req.user.id;
 
-    //product.create is used for creating a product //
+
+  try {
+    // product.create is used for creating a product
     const product = await Product.create(req.body);
     res.status(200).json({
       success: true,
       product,
     });
   } catch (error) {
-    // Check if the error is a Mongoose validation error 
     if (error.name === "ValidationError") {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
@@ -29,7 +27,6 @@ exports.createProduct = catcheasync(async (req, res, next) => {
         messages: validationErrors,
       });
     } else {
-      // Handle other types of errors
       res.status(500).json({
         success: false,
         error: "Server error",
@@ -39,28 +36,28 @@ exports.createProduct = catcheasync(async (req, res, next) => {
 });
 
 exports.getAllProducts = catcheasync(async (req, res, next) => {
-    let resultPerpage =5;
-    
-  let productscounts = await Product.countDocument()
-    try {
-      const apifetures = new Apifetures(Product.find(), req.query).search().filter().pagination(resultPerpage)
-      const products = await apifetures.query;
-  
-      console.log(products); // Log products to console
-      res.status(200).json({
-        success: true,
-        products,
-      });
-    } catch (error) {
-      console.error(error); // Log errors to console
-      res.status(500).json({
-        success: false,
-        error: "Server error",
-      });
-    }
-  });
-  
-  
+  let resultPerpage = 5;
+
+  try {
+    const apifetures = new Apifetures(Product.find(), req.query)
+      .search()
+      .filter()
+      .pagination(resultPerpage);
+    const products = await apifetures.query;
+
+    console.log(products); // Log products to console
+    res.status(200).json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.error(error); // Log errors to console
+    res.status(500).json({
+      success: false,
+      error: "Server error",
+    });
+  }
+});
 
 exports.updateProducts = catcheasync(async (req, res, next) => {
   try {
@@ -85,11 +82,6 @@ exports.updateProducts = catcheasync(async (req, res, next) => {
   }
 });
 
-//delete
-
-// ProductsController.js
-// ProductsController.js
-
 exports.deleteProducts = catcheasync(async (req, res, next) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
@@ -112,8 +104,6 @@ exports.deleteProducts = catcheasync(async (req, res, next) => {
   }
 });
 
-//products details //
-
 exports.getProductsDetails = catcheasync(async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -127,7 +117,9 @@ exports.getProductsDetails = catcheasync(async (req, res, next) => {
     res.status(200).json({
       success: true,
       product,
-      productscounts
+      // Assuming productscounts is defined somewhere in your code
+      // If not, you may need to fetch the counts based on your business logic
+      productscounts: 10, // Replace with the actual count or calculation
     });
   } catch (error) {
     console.error("Error:", error);

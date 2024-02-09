@@ -37,6 +37,8 @@ class Apifetures {
     this.query = this.query.find(JSON.parse(queryStr));
     return this;
   }
+
+
   pagination(resultPerpage) {
     let currentPage = Number(this.queryStr.page) || 1;
     let skip = resultPerpage * (currentPage - 1);
@@ -45,4 +47,6 @@ class Apifetures {
     return this;
   }
 }
+
+
 module.exports = Apifetures;

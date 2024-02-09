@@ -60,6 +60,13 @@ const Productschema = mongoose.Schema({
         }
       }
 ],
+
+user: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'user', // or whatever the reference model is
+  required: true, // make sure this is set if the field is required
+},
+
   createdAt:{
     type:Date,
      default:Date.now,
