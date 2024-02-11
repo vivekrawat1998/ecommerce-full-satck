@@ -9,8 +9,10 @@ exports.isAuthenticationUser = catchAsync(async (req, res, next) => {
     console.log("Token:", token);
 
     if (!token) {
-        return next(new ErrorHandler("Please login to access this resource", 401));
+        return next(new ErrorHandler(" you have no access token Please login to access this resource", 401));
     }
+
+
 
     try {
         const decodedData = jwt.verify(token, process.env.JWT_SECRET);

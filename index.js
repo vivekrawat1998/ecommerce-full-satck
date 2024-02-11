@@ -1,17 +1,16 @@
 const dotenv = require("dotenv");
 const app = require("./app");
 const connectDatabase = require("./config/Database");
-
+const cors = require('cors');
 // Load environment variables
 console.log("Loading environment variables...");
 const result = dotenv.config({ path: '../Backend/config/config.env' });
-
 if (result.error) {
   console.error("Error loading environment variables:", result.error);
   process.exit(1);
 }
 console.log("Environment variables loaded successfully.");
-
+app.use(cors());
 // Connect to the database
 console.log("Connecting to the database...");
 connectDatabase()

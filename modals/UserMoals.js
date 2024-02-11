@@ -50,7 +50,7 @@ userSchema.pre("save", async function (next) {
   }
 
   try {
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 5);
     next();
   } catch (error) {
     next(error);
@@ -77,13 +77,13 @@ userSchema.methods.comparePassword = async function (password) {
 //in this method we are using crypto for generating random password //
 userSchema.methods.getResetPasswordToken = function () {
   // Generate a reset token
-  const resetToken = crypto.randomBytes(20).toString('hex');
+  const resetToken = crypto.randomBytes(5).toString('hex');
   //in this method we are using randomBytes for genertaing random password of 20digit and using hex to coonvert the buffer value to the hex digit//
   
   // Hash the token and set it to resetPasswordToken field
   this.resetPasswordToken = crypto
   //sha256 is the algorithm for security purppose // update for reset the tooken and digeest the hex value//
-    .createHash('sha256')
+    .createHash('SCRAM-SHA-256')
     .update(resetToken)
     .digest('hex');
     //here we do for the reset password that how long it wil supported so it will support for only 15 minutes///
